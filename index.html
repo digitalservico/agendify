@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistema de Agendamento</title>
+    <link rel="stylesheet" href="estilo.css">
+	
+    <script>
+        // SEGURANÇA: Mantido intacto conforme solicitado
+        const sessao = JSON.parse(localStorage.getItem("sessao_ativa"));
+
+        if (!sessao) {
+            window.location.href = "login.html";
+        }
+
+        document.addEventListener("DOMContentLoaded", function() {
+            if (sessao) {
+                const caixaAviso = document.getElementById("avisoAssinatura");
+                if (caixaAviso) {
+                    caixaAviso.innerHTML = `🔴 <strong>${sessao.tipo}:</strong> Restam <strong>${sessao.diasRestantes} dia(s)</strong> de acesso.`;
+                }
+            }
+        });
+    </script>
+</head>
+<body>
+
+    <header class="topo">
+        <h1 id="nomeEmpresa" contenteditable="true">Clique aqui para o Nome da Empresa</h1>
+        <small>Edite o nome acima (Salva automaticamente)</small>
+        <div id="avisoAssinatura" style="color: #e74c3c; font-size: 13px; font-weight: bold; margin-top: 5px;"></div>
+    </header>
+
+    <div class="layout-principal">
+
+        <!-- COLUNA ESQUERDA -->
+        <main class="coluna-principal">
+
+            <!-- NOVO AGENDAMENTO -->
+            <section class="card">
+                <div class="card-header-toggle" onclick="toggleSecao('secaoNovoAgendamento', 'iconNovoAgendamento')">
+                    <h2>Novo Agendamento</h2>
+                    <button type="button" class="btn-toggle" id="iconNovoAgendamento">▲</button>
+                </div>
+
+                <div id="secaoNovoAgendamento" class="conteudo-retratil aberto">
+                    <form id="formAgendamento">
+                        
+                        <div class="campo">
+                            <label for="nomeCliente">Nome do Cliente:</label>
+                            <input type="text" id="nomeCliente" list="listaClientes" placeholder="Digite o nome..." required autocomplete="off">
+                            <datalist id="listaClientes"></datalist>
+                        </div>
+
+                        <div class="linha-dupla">
+                            <div class="campo">
+                                <label for="tel1">Telefone Principal (Opcional):</label>
+                                <input type="tel" id="tel1" placeholder="(62) 9... (ou deixe em branco)">
+                            </div>
+                            <div class="campo-check">
+                                <label><input type="checkbox" id="whats1" checked> É WhatsApp?</label>
+                            </div>
+                        </div>
+
+                        <!-- TIPO DE SERVIÇO (SISTEMA DINÂMICO) -->
+                        <div class="campo-servicos-container">
+                            <label><strong>Tipos de Serviços Contratados:</strong></label>
+                            <div id="containerSelecaoServicos" class="lista-servicos-selecao">
+                                <!-- Inserido dinamicamente via JS -->
+                            </div>
+
+                            <!-- CADASTRO RÁPIDO DE NOVO TIPO DE SERVIÇO -->
+                            <div class="add-servico-box">
+                                <input type="text" id="novoTipoServicoInput" placeholder="Criar novo tipo de serviço...">
+                                <input type="number" id="novoTipoServicoValor" step="0.50" placeholder="Valor (R$)" style="width: 100px;">
+                                <button type="button" class="btn-add-servico" onclick="cadastrarNovoTipoServico()">+ Adicionar Serviço</button>
+                            </div>
+                        </div>
+
+                        <div class="linha-dupla">
+                            <div class="campo">
+                                <label for="dataAgendamento">Data do Agendamento:</label>
+                                <input type="date" id="dataAgendamento" required>
+                            </div>
+                            <div class="campo">
+                                <label for="horaAgendamento">Hora:</label>
+                                <input type="time" id="horaAgendamento" required>
+                            </div>
+                        </div>
+
+                        <button type="submit" class="btn-principal">+ Confirmar Agendamento</button>
+                    </form>
+                </div>
+            </section>
+
+            <!-- AGENDA DE ATENDIMENTOS (HOJE) -->
+            <section class="card">
+                <div class="card-header-toggle" onclick="toggleSecao('secaoAgendaHoje', 'iconAgendaHoje')">
+                    <h2>Agenda de Atendimentos (Hoje)</h2>
+                    <button type="button" class="btn-toggle" id="iconAgendaHoje">▲</button>
+                </div>
+                <div id="secaoAgendaHoje" class="conteudo-retratil aberto">
+                    <div id="listaAgendamentosHoje" class="painel-scroll-medio"></div>
+                </div>
+            </section>
+
+            <!-- PRÓXIMOS AGENDAMENTOS -->
+            <section class="card">
+                <div class="card-header-toggle" onclick="toggleSecao('secaoAgendaFutura', 'iconAgendaFutura')">
+                    <h2>Próximos Agendamentos / Futuros (<span id="totalFuturosBadge">0</span>)</h2>
+                    <button type="button" class="btn-toggle" id="iconAgendaFutura">▼</button>
+                </div>
+                <div id="secaoAgendaFutura" class="conteudo-retratil fechado">
+                    <div id="listaAgendamentosFuturos" class="painel-scroll-medio"></div>
+                </div>
+            </section>
+
+            <!-- GERENCIADOR DE TIPOS DE SERVIÇOS -->
+            <section class="card">
+                <div class="card-header-toggle" onclick="toggleSecao('secaoTiposServicos', 'iconTiposServicos')">
+                    <h2>Tipos de Serviços Cadastrados (<span id="totalTiposServicosBadge">0</span>)</h2>
+                    <button type="button" class="btn-toggle" id="iconTiposServicos">▼</button>
+                </div>
+                <div id="secaoTiposServicos" class="conteudo-retratil fechado">
+                    <div id="listaTiposServicosCadastrados" class="painel-scroll-medio"></div>
+                </div>
+            </section>
+
+            <!-- GERENCIADOR DE CLIENTES -->
+            <section class="card">
+                <div class="card-header-toggle" onclick="toggleSecao('secaoClientes', 'iconClientes')">
+                    <h2>Clientes Cadastrados (<span id="totalClientesBadge">0</span>)</h2>
+                    <button type="button" class="btn-toggle" id="iconClientes">▼</button>
+                </div>
+                <div id="secaoClientes" class="conteudo-retratil fechado">
+                    <div id="listaClientesCadastrados" class="painel-scroll-medio"></div>
+                </div>
+            </section>
+
+            <!-- CAIXA DO DIA -->
+            <section class="card caixa">
+                <h2>Resumo do Caixa (Hoje)</h2>
+                <div class="indicadores">
+                    <div class="caixinha">
+                        <span>Atendidos Hoje:</span>
+                        <strong id="totalAtendidos">0</strong>
+                    </div>
+                    <div class="caixinha verde">
+                        <span>Total Ganho Hoje:</span>
+                        <strong id="faturamentoDia">R$ 0,00</strong>
+                    </div>
+                </div>
+            </section>
+
+        </main>
+
+        <!-- COLUNA DA DIREITA: HISTÓRICO E BACKUP -->
+        <aside class="coluna-historico">
+            <section class="card historico-card">
+                <div class="card-header-toggle" onclick="toggleSecao('secaoHistoricoCompleto', 'iconHistoricoCompleto')">
+                    <h2>Mapas de Atendimentos / Histórico</h2>
+                    <button type="button" class="btn-toggle" id="iconHistoricoCompleto">▲</button>
+                </div>
+                
+                <div id="secaoHistoricoCompleto" class="conteudo-retratil aberto">
+                    <div class="filtros-historico">
+                        <select id="filtroAno"></select>
+                        <select id="filtroMes">
+                            <option value="todos">Todos os Meses</option>
+                            <option value="0">Janeiro</option>
+                            <option value="1">Fevereiro</option>
+                            <option value="2">Março</option>
+                            <option value="3">Abril</option>
+                            <option value="4">Maio</option>
+                            <option value="5">Junho</option>
+                            <option value="6">Julho</option>
+                            <option value="7">Agosto</option>
+                            <option value="8">Setembro</option>
+                            <option value="9">Outubro</option>
+                            <option value="10">Novembro</option>
+                            <option value="11">Dezembro</option>
+                        </select>
+                    </div>
+
+                    <div class="resumo-historico">
+                        <div class="sub-caixa">
+                            <span>Atendimentos:</span>
+                            <strong id="historicoQtdAtendidos">0</strong>
+                        </div>
+                        <div class="sub-caixa verde">
+                            <span>Total do Período:</span>
+                            <strong id="historicoTotalGanho">R$ 0,00</strong>
+                        </div>
+                    </div>
+
+                    <!-- DISTINÇÃO DE PAGAMENTO MANTIDA -->
+                    <div class="detalhamento-pagamentos">
+                        <div class="item-detalhe"><span>Pix:</span> <strong id="subtotalPix">R$ 0,00</strong></div>
+                        <div class="item-detalhe"><span>Dinheiro:</span> <strong id="subtotalDinheiro">R$ 0,00</strong></div>
+                        <div class="item-detalhe"><span>Crédito:</span> <strong id="subtotalCredito">R$ 0,00</strong></div>
+                        <div class="item-detalhe"><span>Débito:</span> <strong id="subtotalDebito">R$ 0,00</strong></div>
+                    </div>
+
+                    <div id="painelHistorico" class="painel-scroll"></div>
+
+                    <button class="btn-pdf" onclick="window.print()">📄 Imprimir / Salvar PDF do Relatório</button>
+
+                    <!-- ÁREA DE BACKUP -->
+                    <div class="painel-backup">
+                        <h3>💾 Cópia de Segurança (Backup)</h3>
+                        <div class="botoes-backup">
+                            <button type="button" class="btn-backup-exportar" onclick="exportarBackup()">💾 Salvar Backup</button>
+                            <button type="button" class="btn-backup-importar" onclick="document.getElementById('inputArquivoBackup').click()">📂 Carregar Backup</button>
+                            <input type="file" id="inputArquivoBackup" accept=".txt,.json" style="display: none;" onchange="importarBackup(event)">
+                        </div>
+                        
+                        <div style="margin-top: 15px; text-align: center;">
+                            <a href="faq.html" target="_blank" style="color: #777; font-size: 12px; text-decoration: underline;">
+                                ❓ Dúvidas sobre Backup e Armazenamento?
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+            </section>
+        </aside>
+
+    </div>
+
+    <!-- MODAL DE EDIÇÃO DA AGENDA -->
+    <div id="modalEdicao" class="modal">
+        <div class="modal-conteudo">
+            <h3>Editar / Reagendar Atendimento</h3>
+            <form id="formEdicao">
+                <input type="hidden" id="editId">
+                <div class="campo">
+                    <label for="editCliente">Nome do Cliente:</label>
+                    <input type="text" id="editCliente" required>
+                </div>
+                <div class="campo">
+                    <label for="editTelefone">Telefone:</label>
+                    <input type="tel" id="editTelefone" placeholder="Deixe em branco para NADA">
+                </div>
+                
+                <div class="campo-servicos-container">
+                    <label><strong>Serviços Contratados:</strong></label>
+                    <div id="containerEditServicos" class="lista-servicos-selecao"></div>
+                </div>
+
+                <div class="linha-dupla">
+                    <div class="campo">
+                        <label for="editData">Nova Data:</label>
+                        <input type="date" id="editData" required>
+                    </div>
+                    <div class="campo">
+                        <label for="editHora">Nova Hora:</label>
+                        <input type="time" id="editHora" required>
+                    </div>
+                </div>
+                <div class="modal-botoes">
+                    <button type="submit" class="btn-principal">Salvar Alterações</button>
+                    <button type="button" class="btn-cancelar btn-acao" onclick="fecharModal()">Cancelar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+	
+    <!-- BOTÃO WHATSAPP -->
+    <a href="https://wa.me/5562982413801?text=Olá,%20preciso%20de%20ajuda%20com%20o%20Agendify!" 
+       target="_blank" 
+       style="position: fixed; bottom: 20px; right: 20px; background-color: #25d366; color: white; padding: 12px 18px; border-radius: 50px; text-decoration: none; font-family: sans-serif; font-weight: bold; font-size: 14px; box-shadow: 0px 4px 10px rgba(0,0,0,0.25); z-index: 9999; display: flex; align-items: center; gap: 8px;">
+       💬 Suporte Agendify
+    </a>
+	
+</body>
+</html>

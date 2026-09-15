@@ -1,0 +1,243 @@
+{
+  "nomeEmpresa": "Boneca de Ferro",
+  "clientes": [
+    {
+      "nome": "Amanda Pereira da Silva",
+      "telefone": "62982413564"
+    },
+    {
+      "nome": "Paulo Henrique",
+      "telefone": "62987142012"
+    },
+    {
+      "nome": "Pedro Alvez",
+      "telefone": "62987415033"
+    },
+    {
+      "nome": "Fernanda Silva",
+      "telefone": "6299725500"
+    },
+    {
+      "nome": "Noemia Perez Ferrarie",
+      "telefone": "629987208720"
+    },
+    {
+      "nome": "Sérgio Paulo Gráfica",
+      "telefone": "62987412256"
+    },
+    {
+      "nome": "Grabrielly Stephânia",
+      "telefone": "61987201314"
+    }
+  ],
+  "tiposServicos": [
+    {
+      "nome": "50 Coxinhas",
+      "valorPadrao": 55
+    },
+    {
+      "nome": "Bolo Simples Chocolate",
+      "valorPadrao": 75
+    },
+    {
+      "nome": "Bolo Normal Chocolate",
+      "valorPadrao": 120
+    },
+    {
+      "nome": "100 Coxinhas",
+      "valorPadrao": 120
+    },
+    {
+      "nome": "25 Coxinhas",
+      "valorPadrao": 30
+    },
+    {
+      "nome": "100 Brigadeiros",
+      "valorPadrao": 110
+    },
+    {
+      "nome": "50 Brigadeiros",
+      "valorPadrao": 55
+    },
+    {
+      "nome": "Bolo de Café",
+      "valorPadrao": 150
+    },
+    {
+      "nome": "Bolo de Leite Ninho",
+      "valorPadrao": 135
+    }
+  ],
+  "agendamentos": [
+    {
+      "id": 1787366099982,
+      "cliente": "Pedro Alvez",
+      "telefone": "62987415033",
+      "servicos": [
+        {
+          "nome": "100 brigadeiros",
+          "valor": 50,
+          "dataInicio": "2026-08-21",
+          "dataVencimento": "2026-08-22"
+        }
+      ],
+      "valor": 50,
+      "horario": "2026-08-21T00:00",
+      "formaPagamento": "Pix",
+      "status": "concluido"
+    },
+    {
+      "id": 1787365676214,
+      "cliente": "Amanda Pereira da Silva",
+      "telefone": "62982413564",
+      "servicos": [
+        {
+          "nome": "Bolo de Aniversário Simples",
+          "valor": 100,
+          "dataInicio": "2026-08-22",
+          "dataVencimento": "2026-08-28"
+        },
+        {
+          "nome": "100 coxinhas",
+          "valor": 100,
+          "dataInicio": "2026-08-22",
+          "dataVencimento": "2026-08-28"
+        },
+        {
+          "nome": "100 brigadeiros",
+          "valor": 50,
+          "dataInicio": "2026-08-22",
+          "dataVencimento": "2026-08-28"
+        }
+      ],
+      "valor": 250,
+      "horario": "2026-08-21T23:24",
+      "formaPagamento": "Crédito",
+      "status": "concluido"
+    },
+    {
+      "id": 1787369425991,
+      "cliente": "Sérgio Paulo Gráfica",
+      "telefone": "62987412256",
+      "servicos": [
+        {
+          "nome": "20 coxinhas",
+          "valor": 25,
+          "dataInicio": "2026-08-22",
+          "dataVencimento": "2026-08-22"
+        }
+      ],
+      "valor": 25,
+      "horario": "2026-08-22T00:28",
+      "formaPagamento": "Dinheiro",
+      "status": "concluido"
+    },
+    {
+      "id": 1787367551742,
+      "cliente": "Fernanda Silva",
+      "telefone": "6299725500",
+      "servicos": [
+        {
+          "nome": "Bolo Normal Chocolate",
+          "valor": 120,
+          "dataInicio": "2026-08-22",
+          "dataVencimento": "2026-08-23",
+          "horaEntrega": "20:00"
+        },
+        {
+          "nome": "100 Brigadeiros",
+          "valor": 110,
+          "dataInicio": "2026-08-22",
+          "dataVencimento": "2026-08-22",
+          "horaEntrega": "20:00"
+        }
+      ],
+      "valor": 230,
+      "horario": "2026-08-22T07:00",
+      "formaPagamento": "Crédito",
+      "status": "agendado"
+    },
+    {
+      "id": 1787371088759,
+      "cliente": "Amanda Pereira da Silva",
+      "telefone": "62982413564",
+      "servicos": [
+        {
+          "nome": "Bolo Simples Chocolate",
+          "valor": 75,
+          "dataInicio": "2026-08-22",
+          "dataVencimento": "2026-08-23",
+          "horaEntrega": "07:00"
+        }
+      ],
+      "valor": 75,
+      "horario": "2026-08-22T19:00",
+      "formaPagamento": "Pix",
+      "status": "agendado"
+    },
+    {
+      "id": 1787367892966,
+      "cliente": "Noemia Perez Ferrarie",
+      "telefone": "629987208720",
+      "servicos": [
+        {
+          "nome": "100 Coxinhas",
+          "valor": 120,
+          "dataInicio": "2026-08-24",
+          "dataVencimento": "2026-08-24",
+          "horaEntrega": "19:00"
+        },
+        {
+          "nome": "100 Brigadeiros",
+          "valor": 110,
+          "dataInicio": "2026-08-24",
+          "dataVencimento": "2026-08-24",
+          "horaEntrega": ""
+        }
+      ],
+      "valor": 230,
+      "horario": "2026-08-24T07:00",
+      "formaPagamento": "Crédito",
+      "status": "agendado"
+    },
+    {
+      "id": 1787371882655,
+      "cliente": "Grabrielly Stephânia",
+      "telefone": "61987201314",
+      "servicos": [
+        {
+          "nome": "100 Coxinhas",
+          "valor": 120,
+          "dataInicio": "2026-10-01",
+          "dataVencimento": "2026-10-01",
+          "horaEntrega": "21:00"
+        },
+        {
+          "nome": "100 Brigadeiros",
+          "valor": 110,
+          "dataInicio": "2026-10-01",
+          "dataVencimento": "2026-10-01",
+          "horaEntrega": "21:00"
+        },
+        {
+          "nome": "Bolo de Café",
+          "valor": 150,
+          "dataInicio": "2026-10-01",
+          "dataVencimento": "2026-10-01",
+          "horaEntrega": "21:00"
+        },
+        {
+          "nome": "Bolo de Leite Ninho",
+          "valor": 135,
+          "dataInicio": "2026-10-01",
+          "dataVencimento": "2026-10-01",
+          "horaEntrega": "21:00"
+        }
+      ],
+      "valor": 515,
+      "horario": "2026-10-01T07:00",
+      "formaPagamento": "Crédito",
+      "status": "agendado"
+    }
+  ]
+}

@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Acesso ao Sistema</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: sans-serif; }
+        body { background-color: #f4f6f9; display: flex; justify-content: center; align-items: center; min-height: 100vh; padding: 20px; }
+        .card-login { 
+    background: #fff; 
+    width: 100%; 
+    max-width: 400px; 
+    padding: 30px; 
+    border-radius: 10px; 
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1); 
+    position: relative; /* Garante o alinhamento da marca d'água */
+    overflow: hidden;   /* Evita que o logo saia das bordas arredondadas */
+}
+
+/* MARCA D'ÁGUA DO LOGO NO FUNDO DO LOGIN */
+.card-login::before {
+    content: "";
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background-image: url('logo.png');
+    background-repeat: no-repeat;
+    background-position: center 20%;
+    background-size: 220px auto; /* Tamanho proporcional da marca d'água */
+    opacity: 0.30;               /* Transparência suave para não atrapalhar a leitura */
+    pointer-events: none;        /* Permite clicar nos campos normalmente */
+}
+		
+		
+		
+        /* Abas */
+        .abas { display: flex; border-bottom: 2px solid #eee; margin-bottom: 20px; }
+        .aba-btn { flex: 1; padding: 10px; background: none; border: none; font-weight: bold; color: #777; cursor: pointer; }
+        .aba-btn.ativa { color: #27ae60; border-bottom: 3px solid #27ae60; }
+        
+        .formulario { display: none; }
+        .formulario.ativo { display: block; }
+        
+        .campo { margin-bottom: 15px; }
+        .campo label { display: block; margin-bottom: 5px; font-size: 14px; color: #333; font-weight: bold; }
+        .campo input { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 5px; font-size: 14px; }
+        
+        .btn-principal { width: 100%; padding: 12px; background-color: #27ae60; color: white; border: none; border-radius: 5px; font-size: 16px; font-weight: bold; cursor: pointer; margin-top: 10px; }
+        .btn-principal:hover { background-color: #219150; }
+        
+        /* Caixas de Resultado e Alerta */
+        .caixa-resultado { display: none; margin-top: 20px; padding: 15px; background: #e8f8f5; border: 1px solid #27ae60; border-radius: 5px; text-align: center; }
+        .caixa-resultado h3 { color: #27ae60; margin-bottom: 10px; font-size: 16px; }
+        .codigo-gerado { font-size: 18px; font-weight: bold; color: #2c3e50; background: #fff; padding: 8px; border-radius: 5px; margin: 5px 0; border: 1px dashed #27ae60; word-break: break-all; }
+        .alerta-erro { color: #c0392b; font-size: 13px; margin-top: 10px; text-align: center; display: none; }
+    </style>
+</head>
+<body>
+
+    <div class="card-login">
+        <div class="abas">
+            <button class="aba-btn ativa" onclick="mudarAba('entrar')">Entrar</button>
+            <button class="aba-btn" onclick="mudarAba('cadastrar')">Criar Conta (14 Dias)</button>
+			
+					<!-- ÁREA DE PAGAMENTO LIMPA COM LINK OFICIAL -->
+        </div>
+
+        <!-- FORMULÁRIO 1: ENTRAR -->
+        <div id="formEntrar" class="formulario ativo">
+            <div class="campo">
+                <label>Sua Chave de Acesso:</label>
+                <input type="text" id="loginChave" placeholder="Ex: AGEND-7K6A-98UB" autocomplete="off">
+            </div>
+            <div class="campo">
+                <label>Sua Senha:</label>
+                <input type="password" id="loginSenha" placeholder="Digite sua senha de 4 dígitos">
+            </div>
+            <button type="button" class="btn-principal" onclick="autenticarUsuario()">Entrar no Sistema</button>
+            <div id="erroLogin" class="alerta-erro"></div>
+        </div>
+
+        <!-- FORMULÁRIO 2: CADASTRAR -->
+        <div id="formCadastrar" class="formulario">
+            <div class="campo">
+                <label>Nome:</label>
+                <input type="text" id="cadNome" placeholder="Seu nome" required autocomplete="off">
+            </div>
+            <div class="campo">
+                <label>Sobrenome:</label>
+                <input type="text" id="cadSobrenome" placeholder="Seu sobrenome" required autocomplete="off">
+            </div>
+            <div class="campo">
+                <label>Telefone / WhatsApp:</label>
+                <input type="tel" id="cadTelefone" placeholder="(00) 00000-0000" required autocomplete="off">
+            </div>
+            <button type="button" class="btn-principal" onclick="gerarNovaChave()">Gerar Chave e Ativar no WhatsApp</button>
+            <div id="erroCad" class="alerta-erro"></div>
+
+            <!-- EXIBIÇÃO DA CHAVE GERADA -->
+            <div id="resultadoChave" class="caixa-resultado">
+                <h3>Chave Gerada com Sucesso!</h3>
+                <p style="font-size: 12px; color: #555;">Guarde estes dados para fazer login:</p>
+                <div class="codigo-gerado">Chave: <span id="resChave"></span></div>
+                <div class="codigo-gerado">Senha: <span id="resSenha"></span></div>
+                <p style="font-size: 11px; color: #777; margin-top: 8px;">Enviamos uma cópia para validação no seu WhatsApp.</p>
+            </div>
+			
+			<div style="text-align: center; padding: 20px; background: #fafafa; border-radius: 8px; border: 1px solid #eee; margin-top: 15px;">
+    
+    <p style="font-size: 14px; color: #333; margin-bottom: 5px;"><strong>Acesso Mensal Pré-Pago</strong></p>
+    <p style="font-size: 20px; color: #27ae60; font-weight: bold; margin-bottom: 10px;">R$ 9,99 <span style="font-size: 12px; color: #777;">por 30 dias</span></p>
+
+    <!-- SELOS DE TRANQUILIDADE -->
+    <div style="font-size: 11px; color: #555; margin-bottom: 15px; line-height: 1.4;">
+        ✅ <strong>Sem cartão de crédito</strong> | ✅ <strong>Zero cobrança automática</strong><br>
+        🛡️ Pagamento único via PIX. Acabou os 30 dias, renove só se quiser.
+    </div>
+
+    <!-- BOTÃO DIRETO PARA O NUBANK -->
+    <a href="https://nubank.com.br/cobrar/1g21c/6a83b5c5-1527-4252-a251-85e107d374f0" target="_blank" 
+       style="display: block; width: 100%; padding: 12px; background-color: #820ad1; color: white; text-decoration: none; border-radius: 6px; font-weight: bold; font-size: 14px; box-shadow: 0 3px 6px rgba(0,0,0,0.1);">
+       💜 Pagar via Pix (Página Segura Nubank)
+    </a>
+
+    <p style="font-size: 11px; color: #777; margin-top: 10px;">
+        Ao clicar, você será direcionado para a página oficial de cobrança do Nubank.
+    </p>
+</div>
+			
+        </div>
+		
+		<p style="text-align: center; margin-top: 15px; font-size: 13px;">
+    <a href="faq.html" style="color: #777; text-decoration: underline;">Dúvidas sobre armazenamento e backup? Veja o FAQ</a>
+</p>
+		
+		
+    </div>
+
+    <!-- CARREGA O ARQUIVO DE CHAVES DA MESMA PASTA -->
+    <script src="chaves.js"></script>
+
+    <script>
+        const SEU_WHATSAPP = "5562982413801";
+
+        function mudarAba(aba) {
+            document.querySelectorAll('.aba-btn').forEach(btn => btn.classList.remove('ativa'));
+            document.querySelectorAll('.formulario').forEach(form => form.classList.remove('ativo'));
+
+            if (aba === 'entrar') {
+                document.querySelectorAll('.aba-btn')[0].classList.add('ativa');
+                document.getElementById('formEntrar').classList.add('ativo');
+            } else {
+                document.querySelectorAll('.aba-btn')[1].classList.add('ativa');
+                document.getElementById('formCadastrar').classList.add('ativo');
+            }
+        }
+
+        // Calcula uma chave única combinando Telefone + Nome
+        function criarChavePorTelefone(nome, telefone) {
+            const textoBase = (telefone + nome).replace(/\D/g, '').toLowerCase();
+            let hash1 = 0;
+            let hash2 = 0;
+
+            for (let i = 0; i < textoBase.length; i++) {
+                const char = textoBase.charCodeAt(i);
+                hash1 = (hash1 << 5) - hash1 + char;
+                hash1 |= 0;
+                hash2 = (hash2 << 3) + hash2 ^ char;
+                hash2 |= 0;
+            }
+
+            const p1 = Math.abs(hash1).toString(36).substring(0, 4).toUpperCase().padEnd(4, 'X');
+            const p2 = Math.abs(hash2).toString(36).substring(0, 4).toUpperCase().padEnd(4, 'Y');
+
+            return `AGEND-${p1}-${p2}`;
+        }
+
+        function gerarNovaChave() {
+            const nome = document.getElementById('cadNome').value.trim();
+            const sobrenome = document.getElementById('cadSobrenome').value.trim();
+            const telefone = document.getElementById('cadTelefone').value.trim();
+            const erroCad = document.getElementById('erroCad');
+
+            erroCad.style.display = 'none';
+
+            if (!nome || !telefone) {
+                erroCad.innerText = "Por favor, preencha o Nome e o Telefone.";
+                erroCad.style.display = 'block';
+                return;
+            }
+
+            // Gerador automático e exclusivo por telefone
+            const chaveGerada = criarChavePorTelefone(nome, telefone);
+            const senhaGerada = Math.floor(1000 + Math.random() * 9000).toString();
+
+            // Preenche na tela
+            document.getElementById('resChave').innerText = chaveGerada;
+            document.getElementById('resSenha').innerText = senhaGerada;
+            document.getElementById('resultadoChave').style.display = 'block';
+
+            // Prepara a mensagem para o seu WhatsApp
+            const texto = `Olá! Me cadastrei no sistema.%0A%0A*Nome:* ${nome} ${sobrenome}%0A*Telefone:* ${telefone}%0A*Chave:* ${chaveGerada}%0A*Senha:* ${senhaGerada}%0A%0AAguardo a ativação!`;
+            window.open(`https://api.whatsapp.com/send?phone=${SEU_WHATSAPP}&text=${texto}`, '_blank');
+        }
+
+        function autenticarUsuario() {
+            const chave = document.getElementById('loginChave').value.trim();
+            const senha = document.getElementById('loginSenha').value.trim();
+            const erroLogin = document.getElementById('erroLogin');
+
+            erroLogin.style.display = 'none';
+
+            if (typeof BANCO_DE_CHAVES === 'undefined' || !BANCO_DE_CHAVES[chave]) {
+                erroLogin.innerText = "Chave inválida ou não encontrada.";
+                erroLogin.style.display = 'block';
+                return;
+            }
+
+            const dados = BANCO_DE_CHAVES[chave];
+
+            if (dados.senha !== senha) {
+                erroLogin.innerText = "Senha incorreta.";
+                erroLogin.style.display = 'block';
+                return;
+            }
+
+            const hoje = new Date();
+            const pData = dados.dataCriacao.split("-");
+            const dataCriacao = new Date(pData[0], pData[1] - 1, pData[2]);
+            
+            const diasPassados = Math.floor((hoje - dataCriacao) / (1000 * 60 * 60 * 24));
+            const diasRestantes = dados.diasValidade - diasPassados;
+
+            if (diasRestantes <= 0) {
+                erroLogin.innerText = "Sua chave expirou! Faça a assinatura para renovar.";
+                erroLogin.style.display = 'block';
+                return;
+            }
+
+            localStorage.setItem("sessao_ativa", JSON.stringify({
+                chave: chave,
+                diasRestantes: diasRestantes,
+                tipo: dados.diasValidade <= 14 ? "Teste Grátis" : "Assinante"
+            }));
+
+            window.location.href = "index.html";
+        }
+    </script>
+	
+	
+	<!-- BOTÃO FLUTUANTE DO WHATSAPP -->
+<a href="https://wa.me/5562982413801?text=Olá,%20preciso%20de%20ajuda%20com%20o%20Agendify!" 
+   target="_blank" 
+   style="position: fixed; bottom: 20px; right: 20px; background-color: #25d366; color: white; padding: 12px 18px; border-radius: 50px; text-decoration: none; font-family: sans-serif; font-weight: bold; font-size: 14px; box-shadow: 0px 4px 10px rgba(0,0,0,0.25); z-index: 9999; display: flex; align-items: center; gap: 8px;">
+   💬 Suporte Agendify
+</a>
+</body>
+</html>
